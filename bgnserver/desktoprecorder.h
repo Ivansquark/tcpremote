@@ -28,6 +28,7 @@ public:
     };
 
     QImage& getImage();
+    void stopRecord();
 
 private slots:
     void timeOut();

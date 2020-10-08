@@ -17,6 +17,11 @@ QImage& DesktopRecorder::getImage()
     return *currentImage;
 }
 
+void DesktopRecorder::stopRecord()
+{
+    timer->stop();
+}
+
 void DesktopRecorder::init() {
     timer = new QTimer(this);
     connect(timer,&QTimer::timeout,this,&DesktopRecorder::timeOut);

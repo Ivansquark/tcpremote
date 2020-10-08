@@ -17,10 +17,6 @@ void server::init() {
     connect(ButExit,&QPushButton::clicked,this,&server::onButExit);
     ButCreate = new QPushButton("Create",this);
     connect(ButCreate,&QPushButton::clicked,this,&server::onButCreate);
-    ButRecord = new QPushButton("Record",this);
-    connect(ButRecord,&QPushButton::clicked,this,&server::onButRecord);
-    ButSend = new QPushButton("Send",this);
-    connect(ButSend,&QPushButton::clicked,this,&server::onButSend);
     LabCreate = new QLabel("",this);
     LabState = new QLabel("Disconnected",this);
     IPconnected = new QLabel("",this);
@@ -28,8 +24,6 @@ void server::init() {
     VertLayout->addWidget(LabState);
     VertLayout->addWidget(IPconnected);
     VertLayout->addWidget(ButCreate);
-    VertLayout->addWidget(ButRecord);
-    VertLayout->addWidget(ButSend);
     VertLayout->addWidget(ButExit);
     setLayout(VertLayout);
     timer = new QTimer(this);
@@ -59,13 +53,17 @@ void server::onButCreate() {
 }
 
 void server::newConnection()
-{
-    LabState->setText("Connected");
+{    
     /*!< указываем клиентский сокет сервера на подключенного клиента >*/
     Client = Ser->nextPendingConnection();
     connect(Client,&QTcpSocket::disconnected,this, &server::clientDisconnected);
     connect(Client,&QTcpSocket::readyRead,this,&server::readClient);
-    ReceivedData = new QByteArray;
+    //connect(Client,&QTcpSocket::connected,this,&server::onConnected);
+    LabState->setText("Connected");
+    /*!< создаем объект в конструкторе которого запускается съемка рабочего стола за определенное время >*/
+    recorder = new DesktopRecorder;
+    /*!< запускаем таймер по которому передаем картинку по TCP >*/
+    timer->start(100);
 }
 
 void server::sendToClient(QTcpSocket *sock, QImage *img)
@@ -76,11 +74,12 @@ void server::sendToClient(QTcpSocket *sock, QImage *img)
         out.setVersion(QDataStream::Qt_5_12);
         out<<quint32(0)<<*img; // записываем размер изображения и само изображение
         out.device()->seek(0); //переходим на начало потока
-        qDebug()<<"Size = "<<(quint32*)(byteArr.size() - sizeof(quint32));
+        //qDebug()<<"Size = "<<(quint32*)(byteArr.size() - sizeof(quint32));
         out<<(quint32)(byteArr.size() - sizeof(uint32_t)); //записываем в начало пакета его размер
-        quint32 written = sock->write(byteArr);
+        //quint32 written = sock->write(byteArr);
+        sock->write(byteArr);
         sock->waitForBytesWritten(-1);
-        qDebug()<<"written "<<written<<" of " <<byteArr.size();
+        //qDebug()<<"written "<<written<<" of " <<byteArr.size();
     }
 }
 
@@ -96,23 +95,23 @@ QByteArray server::readClient() {
 }
 
 void server::clientDisconnected() {
+    recorder->stopRecord();
+    timer->stop();
     LabState->setText("Disconnected");
+    //delete Client;
+    //Client = nullptr;
     Client->deleteLater();
+    recorder->deleteLater();
 }
 
-void server::onButSend()
-{
-    timer->start(100);
-}
+
 
 void server::timeOut()
 {
-    QImage& img = recorder->getImage();
-    sendToClient(Client,&img);
-}
-
-void server::onButRecord() {
-    recorder = new DesktopRecorder;
+    if(Client->state() == QAbstractSocket::ConnectedState) {
+        QImage& img = recorder->getImage();
+        sendToClient(Client,&img);
+    }
 }
 
 void server::onButExit() {

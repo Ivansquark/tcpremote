@@ -21,7 +21,7 @@ void Client::init() {
     connect(client,&QTcpSocket::connected,this,&Client::isConnected);
     connect(client,&QTcpSocket::readyRead,this,&Client::readFromServer);
     connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)));
-    connect(client,&QTcpSocket::disconnected,[this](){*state="Disconnected";});
+    connect(client,&QTcpSocket::disconnected,[this](){*state="Disconnected";IsConnected=false;emit connectionSignal();});
 }
 
 void Client::connectToServer()
@@ -51,6 +51,8 @@ void Client::slotError(QAbstractSocket::SocketError err)
 
 void Client::isConnected() {
     *state = "Connected";
+    IsConnected = true;
+    emit connectionSignal();
 }
 
 void Client::readFromServer()
@@ -65,7 +67,7 @@ void Client::readFromServer()
                 return; //количество пришедших байт меньше чем переменная в которой записан размер
             }
             in>>imageSize; //получаем размер
-            qDebug()<<"image size = "<<imageSize;
+            //qDebug()<<"image size = "<<imageSize;
         }
         if(client->bytesAvailable() <imageSize) {
             return; //ждем пока наполнится сокет

@@ -24,10 +24,8 @@ public:
 private slots:
     void onButExit();
     void onButCreate();
-    void onButRecord();
     void newConnection();
     void clientDisconnected();
-    void onButSend();
     void timeOut();
     /*!< читаем от клиента события от мыши и клавиатуры >*/
     QByteArray readClient();
@@ -37,13 +35,10 @@ private:
     QNetworkInterface* networkSession{nullptr};
     QVBoxLayout* VertLayout{nullptr};
     QPushButton* ButExit{nullptr};
-    QPushButton* ButCreate{nullptr};
-    QPushButton* ButRecord{nullptr};
-    QPushButton* ButSend{nullptr};
+    QPushButton* ButCreate{nullptr};    
     QLabel* LabCreate{nullptr};
     QLabel* LabState{nullptr};
     QLabel* IPconnected{nullptr};
-    QByteArray* ReceivedData{nullptr};
     DesktopRecorder* recorder{nullptr};
     QTimer* timer{nullptr};
 

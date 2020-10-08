@@ -42,10 +42,10 @@ public:
 private slots:
     void on_pushButton_clicked();
     /*!< ScreenShot button >*/
-    void on_pushButton_2_clicked();
     void onButConnect();
     void onButDisonnect();
     void timeOut();
+    void connectedToServer();
 
 private:
     Ui::DesktopRecorder *ui;

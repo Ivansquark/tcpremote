@@ -21,6 +21,7 @@ void DesktopRecorder::init() {
     //lab->setGeometry(40,40,100,100);
     //lab->show();
     client = new Client;
+    connect(client,SIGNAL(connectionSignal()),this,SLOT(connectedToServer()));
     LabState = new QLabel(this);
     LabState->setGeometry(1020,600,80,30);
     LabState->show();
@@ -36,10 +37,11 @@ void DesktopRecorder::init() {
     connect(butDisconnect,&QPushButton::clicked,this,&DesktopRecorder::onButDisonnect);
     view = new QGraphicsView(this);
     view->setGeometry(0,0,1000,800);
-    ui->pushButton_2->setGeometry(1000,800,100,100);
     ui->pushButton->setGeometry(1200,800,100,100);
     timer = new QTimer(this);
     connect(timer,&QTimer::timeout,this,&DesktopRecorder::timeOut);
+
+    scene = new QGraphicsScene(this);
 }
 
 void DesktopRecorder::onButConnect() {
@@ -56,20 +58,24 @@ void DesktopRecorder::on_pushButton_clicked()
     close();
 }
 
-void DesktopRecorder::on_pushButton_2_clicked()
-{
-    //timer->setSingleShot(true);
-    timer->start(100);
-}
 
 void DesktopRecorder::timeOut()
 {
     //QImage im;
-    //lab->setPixmap(QPixmap::fromImage(im));
-    scene = new QGraphicsScene(this);
-    scene->addPixmap(QPixmap::fromImage(*client->img));
+    //lab->setPixmap(QPixmap::fromImage(im));    
+    scene->addPixmap(QPixmap::fromImage(*client->img));    
     view->setScene(scene);
     LabState->setText(client->getState());
+}
+
+void DesktopRecorder::connectedToServer()
+{
+    if(client->IsConnected){
+        timer->start(100);
+    } else {
+        timer->stop();
+        scene->clear();
+    }
 }
 
 

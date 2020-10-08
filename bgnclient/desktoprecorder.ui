@@ -26,19 +26,6 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>420</y>
-     <width>201</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ScreenShot</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

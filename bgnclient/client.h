@@ -19,6 +19,10 @@ public:
     void disconnectFromServer();
     void sendToServer(QByteArray);
     QImage* img{nullptr};
+    bool IsConnected{false};
+signals:
+    void connectionSignal();
+
 private slots:
     void isConnected();
     void readFromServer();
