@@ -18,11 +18,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     client.cpp \
     desktoprecorder.cpp \
-    main.cpp
+    keyboard.cpp \
+    main.cpp \
+    mouse.cpp
 
 HEADERS += \
     client.h \
-    desktoprecorder.h
+    desktoprecorder.h \
+    keyboard.h \
+    mouse.h
 
 FORMS += \
     desktoprecorder.ui

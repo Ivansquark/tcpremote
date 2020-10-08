@@ -63,7 +63,7 @@ void server::newConnection()
     /*!< создаем объект в конструкторе которого запускается съемка рабочего стола за определенное время >*/
     recorder = new DesktopRecorder;
     /*!< запускаем таймер по которому передаем картинку по TCP >*/
-    timer->start(100);
+    timer->start(10000);
 }
 
 void server::sendToClient(QTcpSocket *sock, QImage *img)
@@ -83,7 +83,7 @@ void server::sendToClient(QTcpSocket *sock, QImage *img)
     }
 }
 
-QByteArray server::readClient() {
+void server::readClient() {
     QTcpSocket* clientSock = static_cast<QTcpSocket*>(QObject::sender()); //данные от клиента
     QDataStream in(clientSock);
     in.setVersion(QDataStream::Qt_5_12);
@@ -91,7 +91,19 @@ QByteArray server::readClient() {
     for(uint16_t i=0; i<clientSock->bytesAvailable();i++) {
         in>>receivedArr;
     }
-    return receivedArr;
+    if(!receivedArr[0]) { //если ноль => мышь
+        uint8_t mouseButtonPressed = receivedArr[1];
+        uint8_t pos[4];
+        for(int i=0;i<4;i++) {
+            pos[i] = receivedArr[i+2];
+        }
+        uint16_t x = (pos[0]<<8|pos[1]);
+        uint16_t y = (pos[2]<<8|pos[3]);
+        //QCursor::setPos(x,y);
+        qDebug()<< x << y;
+    } else {
+        /*!< Клавиатура кнопка: 1-255 >*/
+    }
 }
 
 void server::clientDisconnected() {

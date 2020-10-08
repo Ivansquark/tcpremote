@@ -28,7 +28,7 @@ private slots:
     void clientDisconnected();
     void timeOut();
     /*!< читаем от клиента события от мыши и клавиатуры >*/
-    QByteArray readClient();
+    void readClient();
 private:
     QTcpServer* Ser{nullptr};
     QTcpSocket* Client{nullptr};

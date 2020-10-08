@@ -7,6 +7,9 @@ Client::Client()
 Client::~Client() {
     delete client;
     delete state;
+    delete timer;
+    delete mouse;
+    delete keyboard;
 }
 
 const QString &Client::getState()
@@ -17,11 +20,20 @@ const QString &Client::getState()
 void Client::init() {
     state = new QString("Disconnected");
     img = new QImage;
+    timer = new QTimer(this);
+    connect(timer,&QTimer::timeout, this, &Client::timeOut);
     client = new QTcpSocket(this);
     connect(client,&QTcpSocket::connected,this,&Client::isConnected);
     connect(client,&QTcpSocket::readyRead,this,&Client::readFromServer);
     connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)));
-    connect(client,&QTcpSocket::disconnected,[this](){*state="Disconnected";IsConnected=false;emit connectionSignal();});
+    connect(client,&QTcpSocket::disconnected,[this]() {
+        *state="Disconnected";
+        IsConnected=false;
+        emit connectionSignal();
+        timer->stop();
+    });
+    mouse = new Mouse;
+    keyboard = new Keyboard;
 }
 
 void Client::connectToServer()
@@ -46,13 +58,15 @@ void Client::slotError(QAbstractSocket::SocketError err)
                                                 err == QAbstractSocket::ConnectionRefusedError?
                                                     "The connection was refused." :
                                                     QString(client->errorString()));
-        state->append(strError);
+    state->append(strError);
 }
+
 
 void Client::isConnected() {
     *state = "Connected";
     IsConnected = true;
     emit connectionSignal();
+    timer->start(1000);
 }
 
 void Client::readFromServer()
@@ -81,7 +95,30 @@ void Client::readFromServer()
         }
 }
 
-void Client::sendToServer(QByteArray) {
+void Client::timeOut()
+{
+    if((client->state() == QAbstractSocket::ConnectedState)) {
+        who = keyboard->whatKeyPressed();
+        QByteArray arr;
+        arr.append(who);
+        if(!who) { //клавиатура не нажималась => отсылаем мышь
+            arr.append(mouse->leftButPressed);
+            mouse->getPos();
+            for(uint8_t i=0; i<sizeof(Mouse::Pos); i++) {
+                arr.append(*(reinterpret_cast<uint8_t*>(&mouse->pos)+i));
+            }
+        } else { //была нажата кнопка клавиатуры
+            //ничего не делаем массив уже заполнен номером нажатой клавиши
+        }
+        arr.append(who);
+        sendToServer(arr);
+    }
+}
 
+
+void Client::sendToServer(QByteArray data) {
+    if(client->state() == QAbstractSocket::ConnectedState) {
+        client->write(data);
+    }
 }
 
