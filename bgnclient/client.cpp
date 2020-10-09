@@ -67,13 +67,13 @@ void Client::isConnected() {
     *state = "Connected";
     IsConnected = true;
     emit connectionSignal();
-    timer->start(100);
+    timer->start(500);
 }
 
 void Client::readFromServer()
 {
     QDataStream in(client);
-        in.setVersion(QDataStream::Qt_5_12);
+        in.setVersion(QDataStream::Qt_5_11);
         //initialize data
         QImage image;
         static quint32 imageSize = 0;
@@ -103,7 +103,8 @@ void Client::timeOut()
         QByteArray arr;
         arr.append(who);
         if(!who) { //клавиатура не нажималась => отсылаем мышь
-            arr.append(mouse->leftButPressed);
+            arr.append(mouse->isMouseLeftButtonPressed());
+            mouse->leftButPressed=0; //очищаем событие нажатия на мышь
             mouse->getPos();
             for(uint8_t i=0; i<sizeof(Mouse::Pos); i++) {
                 arr.append(*(reinterpret_cast<uint8_t*>(&mouse->pos)+i));

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <QCursor>
+#include <QMouseEvent>
+#include <QApplication>
 
 class Mouse
 {
@@ -13,6 +15,7 @@ public:
         uint16_t y=0;
     };
     uint8_t leftButPressed = 0;
+    uint8_t isMouseLeftButtonPressed();
     Pos pos;
     /*!< записываем позицию курсора >*/
     void getPos();

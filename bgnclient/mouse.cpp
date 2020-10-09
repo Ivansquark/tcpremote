@@ -2,7 +2,12 @@
 
 Mouse::Mouse()
 {
+}
 
+uint8_t Mouse::isMouseLeftButtonPressed()
+{
+    leftButPressed = QApplication::mouseButtons();
+    return leftButPressed;
 }
 
 void Mouse::getPos()
