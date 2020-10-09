@@ -36,7 +36,7 @@ void DesktopRecorder::init() {
     butDisconnect->show();
     connect(butDisconnect,&QPushButton::clicked,this,&DesktopRecorder::onButDisonnect);
     view = new QGraphicsView(this);
-    view->setGeometry(0,0,1000,800);
+    view->setGeometry(0,0,800,600);
     ui->pushButton->setGeometry(1200,800,100,100);
     timer = new QTimer(this);
     connect(timer,&QTimer::timeout,this,&DesktopRecorder::timeOut);

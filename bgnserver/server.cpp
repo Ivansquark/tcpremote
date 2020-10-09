@@ -62,7 +62,7 @@ void server::newConnection()
     /*!< создаем объект в конструкторе которого запускается съемка рабочего стола за определенное время >*/
     recorder = new DesktopRecorder;
     /*!< запускаем таймер по которому передаем картинку по TCP >*/
-    timer->start(1000);
+    timer->start(100);
 }
 
 void server::sendToClient(QTcpSocket *sock, QImage *img)
@@ -70,7 +70,7 @@ void server::sendToClient(QTcpSocket *sock, QImage *img)
     if(sock->state() == QTcpSocket::ConnectedState ) {
         QByteArray byteArr;
         QDataStream out(&byteArr,QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_12);
+        out.setVersion(QDataStream::Qt_5_11);
         out<<quint32(0)<<*img; // записываем размер изображения и само изображение
         out.device()->seek(0); //переходим на начало потока
         //qDebug()<<"Size = "<<(quint32*)(byteArr.size() - sizeof(quint32));
@@ -82,10 +82,12 @@ void server::sendToClient(QTcpSocket *sock, QImage *img)
     }
 }
 
+
+
 void server::readClient() {
     QTcpSocket* clientSock = static_cast<QTcpSocket*>(QObject::sender()); //данные от клиента
     QDataStream in(clientSock);
-    in.setVersion(QDataStream::Qt_5_12);
+    in.setVersion(QDataStream::Qt_5_11);
     QByteArray receivedArr;
     uint8_t buf[20]={0};
     uint8_t bytes = clientSock->bytesAvailable();
@@ -105,13 +107,30 @@ void server::readClient() {
         }
         x = (pos[1]<<8|pos[0]);
         y = (pos[3]<<8|pos[2]);
-        //QCursor::setPos(x,y);
-        qDebug()<< x << y ;
+        QCursor::setPos(QGuiApplication::primaryScreen(),x,y);
+        /*!< если была нажата кнопка мыши >*/
+        if(buf[1]) {
+            QPoint pos(x,y);
+            sendEvtMouseLeftClick(pos);
+        } else {
+            QCursor::setPos(x,y);
+        }
+        //qDebug()<< x << y ;
     } else {
         /*!< Клавиатура кнопка: 1-255 >*/
     }
     //QPoint currentCursor = QCursor::pos();
-    QCursor::setPos(QGuiApplication::primaryScreen(),x,y);
+
+}
+
+void server::sendEvtMouseLeftClick(QPoint& pos)
+{
+    QCursor::setPos(pos);
+    Display* display = XOpenDisplay(nullptr);
+    if(display==nullptr) {return;}
+    XTestFakeButtonEvent(display,Qt::LeftButton,1,-1);
+    XFlush(display);
+    XCloseDisplay(display);
 }
 
 void server::clientDisconnected() {

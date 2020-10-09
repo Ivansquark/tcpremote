@@ -11,6 +11,7 @@
 #include <QNetworkInterface>
 #include <QImage>
 #include <QtNetwork>
+#include <X11/extensions/XTest.h>
 #include "desktoprecorder.h"
 
 class server: public QDialog
@@ -45,6 +46,7 @@ private:
     void init();    
     /*!< передаем клиенту картинки с отображением рабочего стола >*/
     void sendToClient(QTcpSocket* sock, QImage* img);
+    void sendEvtMouseLeftClick(QPoint& pos);
 
     static constexpr uint16_t Port = 55555;
 };

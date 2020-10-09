@@ -38,7 +38,8 @@ void Client::init() {
 
 void Client::connectToServer()
 {
-    client->connectToHost("10.0.2.15",55555);
+    //client->connectToHost("10.0.2.15",55555);
+    client->connectToHost("169.254.13.88",55555);
 }
 
 void Client::disconnectFromServer()
@@ -66,7 +67,7 @@ void Client::isConnected() {
     *state = "Connected";
     IsConnected = true;
     emit connectionSignal();
-    timer->start(1000);
+    timer->start(100);
 }
 
 void Client::readFromServer()

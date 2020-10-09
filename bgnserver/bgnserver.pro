@@ -1,5 +1,4 @@
 QT       += core gui network x11extras
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -26,7 +25,7 @@ HEADERS += \
 
 FORMS +=
 
-linux-g++: LIBS += -lX11 -lXfixes
+linux-g++: LIBS += -lX11 -lXfixes -lXtst
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
