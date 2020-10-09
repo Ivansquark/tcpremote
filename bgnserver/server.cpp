@@ -6,8 +6,7 @@ server::server(QWidget* parent):QDialog(parent)
 }
 
 server::~server() {
-    delete timer;
-    delete recorder;
+    delete timer;    
 }
 
 void server::init() {
@@ -63,7 +62,7 @@ void server::newConnection()
     /*!< создаем объект в конструкторе которого запускается съемка рабочего стола за определенное время >*/
     recorder = new DesktopRecorder;
     /*!< запускаем таймер по которому передаем картинку по TCP >*/
-    timer->start(10000);
+    timer->start(1000);
 }
 
 void server::sendToClient(QTcpSocket *sock, QImage *img)
@@ -88,22 +87,31 @@ void server::readClient() {
     QDataStream in(clientSock);
     in.setVersion(QDataStream::Qt_5_12);
     QByteArray receivedArr;
-    for(uint16_t i=0; i<clientSock->bytesAvailable();i++) {
-        in>>receivedArr;
+    uint8_t buf[20]={0};
+    uint8_t bytes = clientSock->bytesAvailable();
+    qDebug()<<"bytes="<<clientSock->bytesAvailable();
+
+    //qDebug()<<receivedArr;
+    /*!< вычитываем сокет >*/
+    for(uint16_t i=0; i<bytes;i++) {
+        in>>buf[i];//receivedArr;
     }
-    if(!receivedArr[0]) { //если ноль => мышь
-        uint8_t mouseButtonPressed = receivedArr[1];
+    uint16_t x=0;
+    uint16_t y=0;
+    if(!buf[0]) { //если ноль => мышь
         uint8_t pos[4];
         for(int i=0;i<4;i++) {
-            pos[i] = receivedArr[i+2];
+            pos[i] = buf[i+2];
         }
-        uint16_t x = (pos[0]<<8|pos[1]);
-        uint16_t y = (pos[2]<<8|pos[3]);
+        x = (pos[1]<<8|pos[0]);
+        y = (pos[3]<<8|pos[2]);
         //QCursor::setPos(x,y);
-        qDebug()<< x << y;
+        qDebug()<< x << y ;
     } else {
         /*!< Клавиатура кнопка: 1-255 >*/
     }
+    //QPoint currentCursor = QCursor::pos();
+    QCursor::setPos(QGuiApplication::primaryScreen(),x,y);
 }
 
 void server::clientDisconnected() {
@@ -113,7 +121,7 @@ void server::clientDisconnected() {
     //delete Client;
     //Client = nullptr;
     Client->deleteLater();
-    recorder->deleteLater();
+    delete recorder;
 }
 
 
