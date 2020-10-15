@@ -31,6 +31,7 @@ private:
     QLabel* LabState{nullptr};
     QLabel* IPconnected{nullptr};
     ServerBackend* backend{nullptr};
+    /*!< объект управляющий исполнением в новом потоке >*/
     QThread* thread{nullptr};
     void init();        
 };

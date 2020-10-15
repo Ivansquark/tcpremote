@@ -34,8 +34,9 @@ private:
     QString* IPs{nullptr};
 
     //void init();
-    /*!< передаем клиенту картинки с отображением рабочего стола >*/
+    /*!< передаем клиенту картинки с отображением рабочего стола и  курсора >*/
     void sendToClient(QTcpSocket* sock, QImage* img);
+    /*!< посылаем сообщение о нажатой левой кнопке мыши >*/
     void sendEvtMouseLeftClick(const QPoint& pos);
 
     static constexpr uint16_t Port = 55555;

@@ -12,6 +12,7 @@
 #include <QApplication>
 #include "X11/extensions/Xfixes.h"
 #include "QX11Info"
+#include <QThread>
 
 class DesktopRecorder: public QObject
 {
@@ -41,7 +42,9 @@ private:
     bool m_cursorCaptureEnabled{false};
 
     void init();
+    /*!< захватываем курсор или нет >*/
     void enableCursorCapture(bool enabled =true);
+    /*!< скриншот изображения >*/
     QImage make_screenshot() const;
 };
 

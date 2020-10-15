@@ -57,6 +57,7 @@ void DesktopRecorder::timeOut()
 {
     /*!< копируем рисунок из стека в кучу и перемасштабируем его для уменьшения размера >*/
     *currentImage = make_screenshot().scaled(800,600,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    //qDebug()<<"DesktopRecorder::timeOut()"<<QThread::currentThread();
 }
 
 DesktopRecorder::Cursor DesktopRecorder::captureCursor() const

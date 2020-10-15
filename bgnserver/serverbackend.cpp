@@ -68,6 +68,7 @@ void ServerBackend::timeOut() {
 }
 
 void ServerBackend::readClient() {
+    qDebug()<<"readClient"<<QThread::currentThread();
     QTcpSocket* clientSock = static_cast<QTcpSocket*>(QObject::sender()); //данные от клиента
     QDataStream in(clientSock);
     in.setVersion(QDataStream::Qt_5_11);
