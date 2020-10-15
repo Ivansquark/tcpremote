@@ -1,5 +1,4 @@
 #include "server.hpp"
-
 #include <QApplication>
 
 int main(int argc, char *argv[])

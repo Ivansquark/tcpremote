@@ -17,11 +17,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     desktoprecorder.cpp \
     main.cpp \
-    server.cpp
+    server.cpp \
+    serverbackend.cpp
 
 HEADERS += \
     desktoprecorder.h \
-    server.hpp
+    server.hpp \
+    serverbackend.h
 
 FORMS +=
 
